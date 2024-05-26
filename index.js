@@ -2,10 +2,12 @@ const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const cors = require('cors');
-const app = express();
 const port = process.env.PORT || 3000;
 
+const app = express();
 app.use(cors());
+
+app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fqvfigl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -22,6 +24,13 @@ async function run() {
   try {
     const database = client.db('jobster_db');
     const usersColletion = database.collection('users');
+
+    app.post('/users', async(req, res)=>{
+      const user = req.body;
+      console.log(user);
+      const result = await usersColletion.insertOne(user);
+      res.send(result);
+    })
     
   } finally {
     // await client.close();
