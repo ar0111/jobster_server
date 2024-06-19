@@ -1,13 +1,14 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
+const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const port = process.env.PORT || 3000;
 
 const app = express();
 app.use(cors());
-
 app.use(express.json());
+app.use(fileUpload());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fqvfigl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -30,6 +31,38 @@ async function run() {
       console.log(user);
       const result = await usersColletion.insertOne(user);
       res.send(result);
+    })
+
+    app.get('/users/:email', async(req, res)=>{
+      const email = req.params.email;
+      const query = {email};
+      const user = await usersColletion.findOne(query);
+      res.send(user);
+    })
+
+    app.put('/updateUser/:email', async(req, res)=>{
+      const email = req.params.email;
+      const data = req.body;
+      
+      const name = data.name;
+      const location = data.location;
+
+      const query = {email};
+      const user = await usersColletion.findOne(query);
+      const filter = {_id: new ObjectId(user._id)};
+
+      const option = {upsert: true};
+
+      const updateDoc = {
+        $set:{
+          name: name,
+          location: location
+        }
+      }
+
+      const result = await usersColletion.updateOne(filter, updateDoc, option);
+      res.send(result);
+
     })
     
   } finally {
