@@ -25,6 +25,7 @@ async function run() {
   try {
     const database = client.db('jobster_db');
     const usersColletion = database.collection('users');
+    const jobsColletion = database.collection('alljobs');
 
     app.post('/users', async(req, res)=>{
       const user = req.body;
@@ -63,6 +64,13 @@ async function run() {
       const result = await usersColletion.updateOne(filter, updateDoc, option);
       res.send(result);
 
+    })
+
+    app.post('/alljobs', async(req, res)=>{
+      const job = req.body;
+      console.log(job);
+      const result = await jobsColletion.insertOne(job);
+      res.send(result);
     })
     
   } finally {
