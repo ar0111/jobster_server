@@ -68,8 +68,16 @@ async function run() {
 
     app.post('/alljobs', async(req, res)=>{
       const job = req.body;
-      console.log(job);
+      // console.log(job);
       const result = await jobsColletion.insertOne(job);
+      res.send(result);
+    })
+
+    app.get('/alljobs/:email', async(req, res)=>{
+      const email = req.params.email;
+      const query = {userEmail:email};
+
+      const result = await jobsColletion.find(query).toArray();
       res.send(result);
     })
     
