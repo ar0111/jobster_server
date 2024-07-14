@@ -80,6 +80,44 @@ async function run() {
       const result = await jobsColletion.find(query).toArray();
       res.send(result);
     })
+
+    app.delete('/deletejob/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id)};
+
+      const result = await jobsColletion.deleteOne(query);
+      res.send(result);
+    })
+
+    app.put('/updatejobs/:id', async(req, res)=>{
+      const id = req.params.id;
+      
+      const data = req.body;
+      // console.log(data);
+      
+      const position = data.position;
+      const company = data.company;
+      const jobLocation = data.jobLocation;
+      const status = data.status;
+      const jobType = data.jobType;
+
+      const filter = {_id: new ObjectId(id)};
+
+      const option = {upsert: true};
+
+      const updateDoc = {
+        $set:{
+          position:position,
+          company:company,
+          jobLocation:jobLocation,
+          status:status,
+          jobType:jobType
+        }
+      }
+
+      const result = await jobsColletion.updateOne(filter, updateDoc, option);
+      res.send(result);
+    })
     
   } finally {
     // await client.close();
